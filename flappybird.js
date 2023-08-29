@@ -30,7 +30,9 @@ let topPipeImg;
 let bottomPipeImg;
 
 // physics
-let velocityX = -2; // pipe's moving left speed
+let velocityX = -2.5; // pipe's moving left speed
+let velocityY = 0; // bird jump speed
+let gravity = 0.1 ;
 
 window.onload = function () {
   // assign variable board to css element board
@@ -55,6 +57,7 @@ window.onload = function () {
 
   requestAnimationFrame(update);
   setInterval(placePipes, 1500) // every 1.5 seconds we place a new pipe
+  document.addEventListener("keydown", moveBird);
 }
 
 
@@ -65,6 +68,8 @@ function update() {
   context.clearRect(0,0, board.width, board.height);
 
   //bird
+  velocityY += gravity;
+  bird.y += Math.max(bird.y + velocityY, 0); // apply to current bird.y, limit bird.y to top of canvas
   context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
   //pipes
@@ -78,6 +83,7 @@ function update() {
 function placePipes() {
 
   let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2);
+  let openingSpace = board.height/4;
 
   let topPipe = {
     img: topPipeImg,
@@ -89,4 +95,22 @@ function placePipes() {
   }
 
   pipeArr.push(topPipe)
+
+  let bottomPipe = {
+    img: bottomPipeImg,
+    x: pipeX,
+    y: randomPipeY + pipeHeight + openingSpace,
+    width: pipeWidth,
+    height: pipeHeight,
+    passed: false,
+  }
+
+  pipeArr.push(bottomPipe)
+}
+
+function moveBird (e) {
+  if(e.code === "Space" || e.code === "ArrowUp") {
+    // jump
+    velocityY = -3;
+  }
 }
