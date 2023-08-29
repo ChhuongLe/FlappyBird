@@ -36,6 +36,7 @@ let gravity = 0.1 ;
 
 let gameOver = false;
 let score = 0;
+let highScore = 0;
 
 window.onload = function () {
   // assign variable board to css element board
@@ -88,12 +89,12 @@ function update() {
     context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
     if(!pipe.passed && bird.x > pipe.x + pipe.width) {
-      score += 0.5; // detects 2 pipe passed so 0.5 is for 1 for 2 pipes
+      score += (1/2  ); // detects 2 pipe passed so 0.5 is for 1 for 2 pipes
       pipe.passed = true;
     }
 
-    // clear pipes that have 
-    while(pipeArr.length > 0 && pipeArr[0].x < 0) {
+    // clear pipes that have
+    while(pipeArr.length > 0 && pipeArr[0].x < -pipeWidth) {
       pipeArr.shift(); // removes first element from array
     }
 
@@ -103,8 +104,18 @@ function update() {
   }
   // score
   context.fillStyle = "white";
-  context.font = "45px sans-serif";
+  context.font = "40px sans-serif";
+
   context.fillText(score, 5, 45);
+
+  if(gameOver) {
+    highScore = Math.max(score, highScore);
+    context.fillText("GAME OVER", 60, 260)
+    context.font = "20px sans-serif"
+    context.fillText("High Score:", 120, 300);
+    context.fillText(highScore, 230, 300)
+    context.fillText("Tap space to restart", 95 , 340 )
+  }
 }
 
 function placePipes() {
@@ -141,6 +152,14 @@ function moveBird (e) {
   if(e.code === "Space" || e.code === "ArrowUp") {
     // jump
     velocityY = -3;
+
+    // game over
+    if(gameOver){
+      bird.y = birdPosY ;
+      pipeArr = [];
+      score = 0;
+      gameOver=false;
+    }
   }
 }
 
