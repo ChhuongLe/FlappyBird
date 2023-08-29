@@ -107,9 +107,15 @@ function update() {
   context.font = "40px sans-serif";
 
   context.fillText(score, 5, 45);
+  if (highScore !== 0) {
+    context.font = "20px sans-serif"
+    context.fillText("High score:", 5, 70)
+    context.fillText(highScore, 115, 71  )
+  }
 
   if(gameOver) {
     highScore = Math.max(score, highScore);
+    context.font = "40px sans-serif";
     context.fillText("GAME OVER", 60, 260)
     context.font = "20px sans-serif"
     context.fillText("High Score:", 120, 300);
