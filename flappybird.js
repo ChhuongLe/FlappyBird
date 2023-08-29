@@ -34,6 +34,9 @@ let velocityX = -2.5; // pipe's moving left speed
 let velocityY = 0; // bird jump speed
 let gravity = 0.1 ;
 
+let gameOver = false;
+let score = 0;
+
 window.onload = function () {
   // assign variable board to css element board
   board = document.getElementById("board");
@@ -56,7 +59,7 @@ window.onload = function () {
   bottomPipeImg.src = "./bottompipe.png"
 
   requestAnimationFrame(update);
-  setInterval(placePipes, 1500) // every 1.5 seconds we place a new pipe
+  setInterval(placePipes, 1000) // every 1.5 seconds we place a new pipe
   document.addEventListener("keydown", moveBird);
 }
 
@@ -64,6 +67,9 @@ window.onload = function () {
 // function to update frames of the canvas (main game loop)
 function update() {
   requestAnimationFrame(update);
+  if(gameOver) {
+    return;
+  }
   // clear previous frame
   context.clearRect(0,0, board.width, board.height);
 
@@ -72,16 +78,39 @@ function update() {
   bird.y = Math.max(bird.y + velocityY, 0); // apply to current bird.y, limit bird.y to top of canvas
   context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
+  if(bird.y > board.height) {
+    gameOver = true;
+  }
   //pipes
   for(let i = 0; i < pipeArr.length; i++) {
     let pipe = pipeArr[i];
     pipe.x += velocityX;
     context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+
+    if(!pipe.passed && bird.x > pipe.x + pipe.width) {
+      score += 0.5; // detects 2 pipe passed so 0.5 is for 1 for 2 pipes
+      pipe.passed = true;
+    }
+
+    // clear pipes that have 
+    while(pipeArr.length > 0 && pipeArr[0].x < 0) {
+      pipeArr.shift(); // removes first element from array
+    }
+
+    if(detectCollision(bird, pipe)) {
+      gameOver = true;
+    }
   }
+  // score
+  context.fillStyle = "white";
+  context.font = "45px sans-serif";
+  context.fillText(score, 5, 45);
 }
 
 function placePipes() {
-
+  if(gameOver) {
+    return;
+  }
   let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2);
   let openingSpace = board.height/4;
 
@@ -113,4 +142,11 @@ function moveBird (e) {
     // jump
     velocityY = -3;
   }
+}
+
+function detectCollision (a, b) {
+  return a.x < b.x + b.width &&
+         a.x + a.width > b.x &&
+         a.y < b.y + b.height &&
+         a.y + a.height > b.y;
 }
