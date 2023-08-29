@@ -19,6 +19,19 @@ let bird = {
   height: birdHeight,
 }
 
+// pipes
+let pipeArr = [];
+let pipeWidth = 64; // height to width ratio = 384/3072 = 1/8
+let pipeHeight = 512;
+let pipeX = boardWidth;
+let pipeY = 0;
+
+let topPipeImg;
+let bottomPipeImg;
+
+// physics
+let velocityX = -2; // pipe's moving left speed
+
 window.onload = function () {
   // assign variable board to css element board
   board = document.getElementById("board");
@@ -33,4 +46,47 @@ window.onload = function () {
   birdImg.onload = function() {
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height)
   }
+
+  topPipeImg = new Image();
+  topPipeImg.src = "./toppipe.png";
+
+  bottomPipeImg = new Image();
+  bottomPipeImg.src = "./bottompipe.png"
+
+  requestAnimationFrame(update);
+  setInterval(placePipes, 1500) // every 1.5 seconds we place a new pipe
+}
+
+
+// function to update frames of the canvas (main game loop)
+function update() {
+  requestAnimationFrame(update);
+  // clear previous frame
+  context.clearRect(0,0, board.width, board.height);
+
+  //bird
+  context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+
+  //pipes
+  for(let i = 0; i < pipeArr.length; i++) {
+    let pipe = pipeArr[i];
+    pipe.x += velocityX;
+    context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+  }
+}
+
+function placePipes() {
+
+  let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2);
+
+  let topPipe = {
+    img: topPipeImg,
+    x: pipeX,
+    y: randomPipeY,
+    width: pipeWidth,
+    height: pipeHeight,
+    passed: false,
+  }
+
+  pipeArr.push(topPipe)
 }
