@@ -12,6 +12,7 @@ let birdPosX = boardWidth/8;
 let birdPosY = boardHeight/2;
 let birdImg;
 
+
 let bird = {
   x: birdPosX,
   y: birdPosY,
@@ -28,6 +29,11 @@ let pipeY = 0;
 
 let topPipeImg;
 let bottomPipeImg;
+
+// audio
+let birdFlap;
+let pointSound;
+let loseSound;
 
 // physics
 let velocityX = -2.5; // pipe's moving left speed
@@ -52,6 +58,11 @@ window.onload = function () {
   birdImg.onload = function() {
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height)
   }
+
+  birdFlap = new Audio("./sfx_wing.mp3");
+  pointSound = new Audio("./sfx_point.mp3");
+  loseSound = new Audio("./sfx_die.mp3");
+
 
   topPipeImg = new Image();
   topPipeImg.src = "./toppipe.png";
@@ -89,8 +100,12 @@ function update() {
     context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
     if(!pipe.passed && bird.x > pipe.x + pipe.width) {
-      score += (1/2  ); // detects 2 pipe passed so 0.5 is for 1 for 2 pipes
+      score += 0.5; // detects 2 pipe passed so 0.5 is for 1 for 2 pipes
       pipe.passed = true;
+    }
+
+    if(bird.x > pipe.x + pipe.width) {
+      pointSound.play();
     }
 
     // clear pipes that have
@@ -99,6 +114,7 @@ function update() {
     }
 
     if(detectCollision(bird, pipe)) {
+      loseSound.play();
       gameOver = true;
     }
   }
@@ -158,6 +174,7 @@ function moveBird (e) {
   if(e.code === "Space" || e.code === "ArrowUp") {
     // jump
     velocityY = -3;
+    playFlap();
 
     // game over
     if(gameOver){
@@ -174,4 +191,8 @@ function detectCollision (a, b) {
          a.x + a.width > b.x &&
          a.y < b.y + b.height &&
          a.y + a.height > b.y;
+}
+
+function playFlap () {
+  birdFlap.play();
 }
