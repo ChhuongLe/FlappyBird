@@ -69,7 +69,7 @@ function update() {
 
   //bird
   velocityY += gravity;
-  bird.y += Math.max(bird.y + velocityY, 0); // apply to current bird.y, limit bird.y to top of canvas
+  bird.y = Math.max(bird.y + velocityY, 0); // apply to current bird.y, limit bird.y to top of canvas
   context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
   //pipes
